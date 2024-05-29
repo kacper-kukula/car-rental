@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user_roles-table
+      author: Kacper Kukula
+      changes:
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: roles
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_roles_user_id
+            onDelete: CASCADE
