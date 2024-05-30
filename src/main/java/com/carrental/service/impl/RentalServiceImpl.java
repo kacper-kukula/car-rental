@@ -2,9 +2,9 @@ package com.carrental.service.impl;
 
 import com.carrental.dto.rental.RentalRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
-import com.carrental.exception.NoInventoryAvailableException;
-import com.carrental.exception.RentalAlreadyReturnedException;
-import com.carrental.exception.UnauthorizedViewException;
+import com.carrental.exception.custom.NoInventoryAvailableException;
+import com.carrental.exception.custom.RentalAlreadyReturnedException;
+import com.carrental.exception.custom.UnauthorizedViewException;
 import com.carrental.mapper.RentalMapper;
 import com.carrental.model.Car;
 import com.carrental.model.Rental;

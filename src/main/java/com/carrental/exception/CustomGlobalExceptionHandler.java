@@ -1,5 +1,9 @@
 package com.carrental.exception;
 
+import com.carrental.exception.custom.NoInventoryAvailableException;
+import com.carrental.exception.custom.RegistrationException;
+import com.carrental.exception.custom.RentalAlreadyReturnedException;
+import com.carrental.exception.custom.UnauthorizedViewException;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;

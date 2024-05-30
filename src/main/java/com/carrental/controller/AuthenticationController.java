@@ -4,7 +4,7 @@ import com.carrental.dto.user.UserLoginRequestDto;
 import com.carrental.dto.user.UserLoginResponseDto;
 import com.carrental.dto.user.UserRegistrationRequestDto;
 import com.carrental.dto.user.UserResponseDto;
-import com.carrental.exception.RegistrationException;
+import com.carrental.exception.custom.RegistrationException;
 import com.carrental.security.AuthenticationService;
 import com.carrental.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
