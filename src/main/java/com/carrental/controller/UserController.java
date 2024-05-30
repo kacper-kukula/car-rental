@@ -1,8 +1,8 @@
 package com.carrental.controller;
 
-import com.carrental.dto.RoleRequestDto;
-import com.carrental.dto.UserResponseDto;
-import com.carrental.dto.UserUpdateRequestDto;
+import com.carrental.dto.user.RoleUpdateRequestDto;
+import com.carrental.dto.user.UserResponseDto;
+import com.carrental.dto.user.UserUpdateRequestDto;
 import com.carrental.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +29,7 @@ public class UserController {
     @Operation(summary = "Set role",
             description = "Set a new role for any user")
     public UserResponseDto setRole(@PathVariable Long id,
-                                   @RequestBody @Valid RoleRequestDto request) {
+                                   @RequestBody @Valid RoleUpdateRequestDto request) {
         return userService.setRole(id, request);
     }
 
