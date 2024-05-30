@@ -1,9 +1,9 @@
 package com.carrental.service.impl;
 
-import com.carrental.dto.RoleRequestDto;
-import com.carrental.dto.UserRegistrationRequestDto;
-import com.carrental.dto.UserResponseDto;
-import com.carrental.dto.UserUpdateRequestDto;
+import com.carrental.dto.user.RoleUpdateRequestDto;
+import com.carrental.dto.user.UserRegistrationRequestDto;
+import com.carrental.dto.user.UserResponseDto;
+import com.carrental.dto.user.UserUpdateRequestDto;
 import com.carrental.exception.RegistrationException;
 import com.carrental.mapper.UserMapper;
 import com.carrental.model.User;
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto setRole(Long id, RoleRequestDto request) {
+    public UserResponseDto setRole(Long id, RoleUpdateRequestDto request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE));
 
