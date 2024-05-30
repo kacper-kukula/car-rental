@@ -1,8 +1,7 @@
 package com.carrental.controller;
 
-import com.carrental.dto.car.CarCreateRequestDto;
+import com.carrental.dto.car.CarRequestDto;
 import com.carrental.dto.car.CarResponseDto;
-import com.carrental.dto.car.CarUpdateRequestDto;
 import com.carrental.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +29,7 @@ public class CarController {
     @PostMapping
     @Operation(summary = "Add a car",
             description = "Add a new car to the available cars")
-    public CarResponseDto createCar(@RequestBody @Valid CarCreateRequestDto request) {
+    public CarResponseDto createCar(@RequestBody @Valid CarRequestDto request) {
         return carService.createCar(request);
     }
 
@@ -52,7 +51,7 @@ public class CarController {
     @Operation(summary = "Update a car by ID",
             description = "Update a specific car including it's inventory")
     public CarResponseDto updateCarById(@PathVariable Long id,
-                                        @RequestBody @Valid CarUpdateRequestDto request) {
+                                        @RequestBody @Valid CarRequestDto request) {
         return carService.updateCarById(id, request);
     }
 

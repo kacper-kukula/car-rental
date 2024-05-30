@@ -1,19 +1,18 @@
 package com.carrental.service;
 
-import com.carrental.dto.car.CarCreateRequestDto;
+import com.carrental.dto.car.CarRequestDto;
 import com.carrental.dto.car.CarResponseDto;
-import com.carrental.dto.car.CarUpdateRequestDto;
 import java.util.List;
 
 public interface CarService {
 
-    CarResponseDto createCar(CarCreateRequestDto request);
+    CarResponseDto createCar(CarRequestDto request);
 
     List<CarResponseDto> findAllCars();
 
     CarResponseDto findCarById(Long id);
 
-    CarResponseDto updateCarById(Long id, CarUpdateRequestDto request);
+    CarResponseDto updateCarById(Long id, CarRequestDto request);
 
     void deleteCarById(Long id);
 }
