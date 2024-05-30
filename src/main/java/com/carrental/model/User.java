@@ -46,6 +46,7 @@ public class User implements UserDetails {
     private boolean isDeleted = false; // Default deletion status
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role = Role.CUSTOMER; // Default role
 
     public enum Role {

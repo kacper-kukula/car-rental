@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-cars-table
+      author: Kacper Kukula
+      changes:
+        - createTable:
+            tableName: cars
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: model
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: brand
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: inventory
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: daily_fee
+                  type: DECIMAL(10,2)
+                  constraints:
+                    nullable: false
