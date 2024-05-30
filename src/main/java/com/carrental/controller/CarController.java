@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,6 +31,7 @@ public class CarController {
     private final CarService carService;
 
     @PostMapping
+    @PreAuthorize("hasRole('MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add a car",
             description = "Add a new car to the available cars")
@@ -51,6 +54,7 @@ public class CarController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     @Operation(summary = "Update a car by ID",
             description = "Update a specific car including it's inventory")
     public CarResponseDto updateCarById(@PathVariable Long id,
@@ -59,9 +63,11 @@ public class CarController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     @Operation(summary = "Delete a car",
             description = "Soft delete a car by it's ID")
-    public void deleteCarById(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCarById(@PathVariable Long id) {
         carService.deleteCarById(id);
+        return ResponseEntity.ok("Car (ID: " + id + ") successfully deleted.");
     }
 }
