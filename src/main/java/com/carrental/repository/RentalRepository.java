@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     List<Rental> findByUserIdAndStatus(Long userId, Rental.Status status);
+
+    List<Rental> findByStatus(Rental.Status status);
 }
