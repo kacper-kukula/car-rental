@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rentals-table
+      author: Kacper Kukula
+      changes:
+        - createTable:
+            tableName: rentals
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: rental_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: return_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: actual_return_date
+                  type: DATE
+                  constraints:
+                    nullable: true
+              - column:
+                  name: car_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_deleted
+                  type: BIT
+                  constraints:
+                    nullable: false
