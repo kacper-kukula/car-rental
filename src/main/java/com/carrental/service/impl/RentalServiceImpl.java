@@ -58,7 +58,13 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public List<RentalResponseDto> findRentalsByUserIdAndStatus(Long userId, boolean isActive) {
         Rental.Status status = isActive ? Rental.Status.ACTIVE : Rental.Status.RETURNED;
-        List<Rental> rentals = rentalRepository.findByUserIdAndStatus(userId, status);
+        List<Rental> rentals;
+
+        if (userId == null) {
+            rentals = rentalRepository.findByStatus(status);
+        } else {
+            rentals = rentalRepository.findByUserIdAndStatus(userId, status);
+        }
 
         return rentals.stream()
                 .map(rentalMapper::toDto)
