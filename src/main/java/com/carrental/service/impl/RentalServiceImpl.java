@@ -4,6 +4,7 @@ import com.carrental.dto.rental.RentalRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
 import com.carrental.exception.NoInventoryAvailableException;
 import com.carrental.exception.RentalAlreadyReturnedException;
+import com.carrental.exception.UnauthorizedViewException;
 import com.carrental.mapper.RentalMapper;
 import com.carrental.model.Car;
 import com.carrental.model.Rental;
@@ -76,6 +77,8 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(RENTAL_NOT_FOUND_MESSAGE));
 
+        validateCurrentUserOwnsRental(rental);
+
         return rentalMapper.toDto(rental);
     }
 
@@ -84,6 +87,8 @@ public class RentalServiceImpl implements RentalService {
     public void returnRental(Long id) {
         Rental rental = rentalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(RENTAL_NOT_FOUND_MESSAGE));
+
+        validateCurrentUserOwnsRental(rental);
 
         if (rental.getStatus() == Rental.Status.RETURNED) {
             throw new RentalAlreadyReturnedException("Rental has already been returned.");
@@ -111,4 +116,11 @@ public class RentalServiceImpl implements RentalService {
                 .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE))
                 .getId();
     }
+
+    private void validateCurrentUserOwnsRental(Rental rental) {
+        if (!rental.getUserId().equals(getCurrentUserIdFromDb())) {
+            throw new UnauthorizedViewException("You are not authorized to view this rental.");
+        }
+    }
+
 }

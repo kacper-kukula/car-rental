@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +37,7 @@ public class RentalController {
     private final UserRepository userRepository;
 
     @PostMapping
+    @PreAuthorize("hasRole('CUSTOMER')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add a new rental",
             description = "Add a new rental and decrease car inventory by 1")
@@ -43,6 +46,7 @@ public class RentalController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     @Operation(summary = "Get rentals by criteria",
             description = "Get rentals by user ID and whether they are active or not")
     public List<RentalResponseDto> findRentalsByUserIdAndStatus(
@@ -59,6 +63,7 @@ public class RentalController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
     @Operation(summary = "Get a rental by ID",
             description = "Get a specific rental and it's detailed information")
     public RentalResponseDto findRentalById(@PathVariable Long id) {
@@ -66,11 +71,13 @@ public class RentalController {
     }
 
     @PostMapping("/{id}/return")
-    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Return a rental car",
             description = "Return a car and increase inventory by 1")
-    public void returnRental(@PathVariable Long id) {
+    public ResponseEntity<String> returnRental(@PathVariable Long id) {
         rentalService.returnRental(id);
+
+        return ResponseEntity.ok("Rental (ID: " + id + ") successfully returned.");
     }
 
     private Authentication getAuthentication() {
