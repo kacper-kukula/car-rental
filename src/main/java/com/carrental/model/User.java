@@ -1,7 +1,6 @@
 package com.carrental.model;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -44,11 +43,10 @@ public class User implements UserDetails {
     private String lastName;
 
     @Column(nullable = false)
-    private boolean isDeleted = false;
+    private boolean isDeleted = false; // Default deletion status
 
-    @ElementCollection
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    private Role role = Role.CUSTOMER; // Default role
 
     public enum Role {
         MANAGER,
@@ -57,9 +55,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(ROLE_PREFIX + role))
-                .toList();
+        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role));
     }
 
     @Override

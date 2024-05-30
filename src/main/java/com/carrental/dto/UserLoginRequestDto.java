@@ -12,4 +12,5 @@ public record UserLoginRequestDto(
         @NotBlank
         @Length(min = 8, max = 20)
         String password
-) {}
+) {
+}

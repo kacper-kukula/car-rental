@@ -22,4 +22,5 @@ public record UserRegistrationRequestDto(
 
         @NotBlank
         String lastName
-) {}
+) {
+}
