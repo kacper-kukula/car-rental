@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-mock-users
+      author: Kacper Kukula
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: 'manager@example.com'
+              - column:
+                  name: password
+                  value: '$2a$10$hLSU4qNrQO6lItn7H/cALuq0YvqLUmAVZ5qlKLsmigSV7FberE8v2' #'safePassword'
+              - column:
+                  name: first_name
+                  value: 'John'
+              - column:
+                  name: last_name
+                  value: 'Doe'
+              - column:
+                  name: role
+                  value: 'MANAGER'
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: 'customer@example.com'
+              - column:
+                  name: password
+                  value: '$2a$10$hLSU4qNrQO6lItn7H/cALuq0YvqLUmAVZ5qlKLsmigSV7FberE8v2' #'safePassword'
+              - column:
+                  name: first_name
+                  value: 'Alice'
+              - column:
+                  name: last_name
+                  value: 'Smith'
+              - column:
+                  name: role
+                  value: 'CUSTOMER'
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
