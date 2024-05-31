@@ -49,4 +49,12 @@ public class Car {
         HATCHBACK,
         UNIVERSAL
     }
+
+    @Override
+    public String toString() {
+        return "Brand: " + brand + '\n'
+                + "Model: " + model + '\n'
+                + "Type: " + type + '\n'
+                + "Daily Fee: $" + dailyFee;
+    }
 }

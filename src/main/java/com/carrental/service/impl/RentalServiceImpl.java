@@ -1,6 +1,6 @@
 package com.carrental.service.impl;
 
-import com.carrental.dto.rental.RentalRequestDto;
+import com.carrental.dto.rental.RentalCreateRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
 import com.carrental.exception.custom.NoInventoryAvailableException;
 import com.carrental.exception.custom.RentalAlreadyReturnedException;
@@ -11,6 +11,7 @@ import com.carrental.model.Rental;
 import com.carrental.repository.CarRepository;
 import com.carrental.repository.RentalRepository;
 import com.carrental.repository.UserRepository;
+import com.carrental.service.NotificationService;
 import com.carrental.service.RentalService;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
@@ -29,15 +30,17 @@ public class RentalServiceImpl implements RentalService {
     private static final String RENTAL_NOT_FOUND_MESSAGE = "Rental not found.";
     private static final String CAR_NOT_FOUND_MESSAGE = "Car not found.";
     private static final String USER_NOT_FOUND_MESSAGE = "User not found.";
+    private static final String TELEGRAM_MESSAGE = "New rental created\n\n%s\n\n%s";
 
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
-    public RentalResponseDto createRental(RentalRequestDto request) {
+    public RentalResponseDto createRental(RentalCreateRequestDto request) {
         Car car = carRepository.findById(request.carId())
                 .orElseThrow(() -> new EntityNotFoundException(CAR_NOT_FOUND_MESSAGE));
 
@@ -52,6 +55,8 @@ public class RentalServiceImpl implements RentalService {
         rental.setUserId(getCurrentUserIdFromDb());
         rental.setRentalDate(LocalDate.now());
         Rental savedRental = rentalRepository.save(rental);
+
+        notificationService.sendNotification(String.format(TELEGRAM_MESSAGE, rental, car));
 
         return rentalMapper.toDto(savedRental);
     }
