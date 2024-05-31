@@ -52,9 +52,11 @@ public class Car {
 
     @Override
     public String toString() {
-        return "Brand: " + brand + '\n'
+        return "Car ID: " + id + '\n'
+                + "Brand: " + brand + '\n'
                 + "Model: " + model + '\n'
                 + "Type: " + type + '\n'
-                + "Daily Fee: $" + dailyFee;
+                + "Daily fee: $" + dailyFee + '\n'
+                + "Inventory left: " + inventory;
     }
 }
