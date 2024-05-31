@@ -54,9 +54,10 @@ public class Rental {
 
     @Override
     public String toString() {
-        return "Rental id: " + id + '\n'
-                + "Start Date: " + rentalDate + '\n'
-                + "Return Date: " + returnDate + '\n'
+        return "Rental ID: " + id + '\n'
+                + "User ID: " + userId + '\n'
+                + "Start date: " + rentalDate + '\n'
+                + "Return date: " + returnDate + '\n'
                 + "Total days: " + ChronoUnit.DAYS.between(rentalDate, returnDate) + '\n'
                 + "Status: " + status;
     }

@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +38,7 @@ public class RentalServiceImpl implements RentalService {
     private final RentalMapper rentalMapper;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final TelegramNotificationService telegramNotificationService;
 
     @Override
     @Transactional
@@ -108,6 +110,23 @@ public class RentalServiceImpl implements RentalService {
 
         car.setInventory(car.getInventory() + 1);
         carRepository.save(car);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // Every day at midnight
+    public void checkOverdueRentals() {
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+        List<Rental> overdueRentals = rentalRepository.findAllByReturnDateBetweenAndStatus(
+                today, tomorrow, Rental.Status.ACTIVE);
+
+        if (overdueRentals.isEmpty()) {
+            telegramNotificationService.sendNotification("No rentals overdue today or tomorrow!");
+        } else {
+            for (Rental rental : overdueRentals) {
+                String message = String.format("Overdue rental:\n\n%s", rental);
+                telegramNotificationService.sendNotification(message);
+            }
+        }
     }
 
     private Long getCurrentUserIdFromDb() {
