@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -49,5 +50,14 @@ public class Rental {
     public enum Status {
         ACTIVE,
         RETURNED
+    }
+
+    @Override
+    public String toString() {
+        return "Rental id: " + id + '\n'
+                + "Start Date: " + rentalDate + '\n'
+                + "Return Date: " + returnDate + '\n'
+                + "Total days: " + ChronoUnit.DAYS.between(rentalDate, returnDate) + '\n'
+                + "Status: " + status;
     }
 }

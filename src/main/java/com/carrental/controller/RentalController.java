@@ -1,6 +1,6 @@
 package com.carrental.controller;
 
-import com.carrental.dto.rental.RentalRequestDto;
+import com.carrental.dto.rental.RentalCreateRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
 import com.carrental.repository.UserRepository;
 import com.carrental.service.RentalService;
@@ -41,7 +41,7 @@ public class RentalController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add a new rental",
             description = "Add a new rental and decrease car inventory by 1")
-    public RentalResponseDto createRental(@RequestBody @Valid RentalRequestDto request) {
+    public RentalResponseDto createRental(@RequestBody @Valid RentalCreateRequestDto request) {
         return rentalService.createRental(request);
     }
 
@@ -54,9 +54,9 @@ public class RentalController {
             @RequestParam(name = "is_active", defaultValue = "true") boolean isActive) {
         if (isManager()) { // Either null to get all users rentals, or for specific user only
             return rentalService.findRentalsByUserIdAndStatus(userId, isActive);
-        } else if (userId != null) { // If a customer passes userId - UNAUTHORIZED
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You are not authorized to specify a user ID.");
+        } else if (userId != null) { // If a customer passes userId - FORBIDDEN
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Customers are not authorized to specify a user ID.");
         } else { // Proceed to get rentals for current customer
             return rentalService.findRentalsByUserIdAndStatus(getCurrentUserId(), isActive);
         }

@@ -4,7 +4,7 @@ import com.carrental.dto.user.RoleUpdateRequestDto;
 import com.carrental.dto.user.UserRegistrationRequestDto;
 import com.carrental.dto.user.UserResponseDto;
 import com.carrental.dto.user.UserUpdateRequestDto;
-import com.carrental.exception.RegistrationException;
+import com.carrental.exception.custom.RegistrationException;
 import com.carrental.mapper.UserMapper;
 import com.carrental.model.User;
 import com.carrental.repository.UserRepository;

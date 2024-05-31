@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 
-public record RentalRequestDto(
+public record RentalCreateRequestDto(
 
         @Positive
         Long carId,

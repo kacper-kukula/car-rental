@@ -1,4 +1,4 @@
-package com.carrental.exception;
+package com.carrental.exception.custom;
 
 public class NoInventoryAvailableException extends RuntimeException {
 
