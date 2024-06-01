@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/changes/03-create-rentals-table.yaml
   - include:
       file: db/changelog/changes/04-add-mock-users.yaml
+  - include:
+      file: db/changelog/changes/05-create-payments-table.yaml

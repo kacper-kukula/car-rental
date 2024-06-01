@@ -10,7 +10,7 @@ import com.carrental.model.Car;
 import com.carrental.model.Rental;
 import com.carrental.repository.CarRepository;
 import com.carrental.repository.RentalRepository;
-import com.carrental.repository.UserRepository;
+import com.carrental.security.AuthenticationUtil;
 import com.carrental.service.NotificationService;
 import com.carrental.service.RentalService;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,9 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,32 +27,33 @@ public class RentalServiceImpl implements RentalService {
 
     private static final String RENTAL_NOT_FOUND_MESSAGE = "Rental not found.";
     private static final String CAR_NOT_FOUND_MESSAGE = "Car not found.";
-    private static final String USER_NOT_FOUND_MESSAGE = "User not found.";
     private static final String TELEGRAM_MESSAGE = "New rental created\n\n%s\n\n%s";
 
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
-    private final TelegramNotificationService telegramNotificationService;
+    private final AuthenticationUtil authenticationUtil;
 
     @Override
     @Transactional
     public RentalResponseDto createRental(RentalCreateRequestDto request) {
         Car car = carRepository.findById(request.carId())
                 .orElseThrow(() -> new EntityNotFoundException(CAR_NOT_FOUND_MESSAGE));
+        int availableInventory = car.getInventory();
 
-        if (car.getInventory() <= 0) {
+        if (availableInventory <= 0) {
             throw new NoInventoryAvailableException("No inventory available for this car.");
         }
 
-        car.setInventory(car.getInventory() - 1);
-        carRepository.save(car);
+        car.setInventory(availableInventory - 1);
+        Car savedCar = carRepository.save(car);
 
-        Rental rental = rentalMapper.toEntity(request);
-        rental.setUserId(getCurrentUserIdFromDb());
+        Rental rental = new Rental();
+        rental.setCar(savedCar);
+        rental.setUser(authenticationUtil.getCurrentUserFromDb());
         rental.setRentalDate(LocalDate.now());
+        rental.setReturnDate(request.returnDate());
         Rental savedRental = rentalRepository.save(rental);
 
         notificationService.sendNotification(String.format(TELEGRAM_MESSAGE, rental, car));
@@ -64,6 +62,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
     public List<RentalResponseDto> findRentalsByUserIdAndStatus(Long userId, boolean isActive) {
         Rental.Status status = isActive ? Rental.Status.ACTIVE : Rental.Status.RETURNED;
         List<Rental> rentals;
@@ -80,6 +79,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
     public RentalResponseDto findRentalById(Long id) {
         Rental rental = rentalRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(RENTAL_NOT_FOUND_MESSAGE));
@@ -105,13 +105,15 @@ public class RentalServiceImpl implements RentalService {
         rental.setStatus(Rental.Status.RETURNED);
         rentalRepository.save(rental);
 
-        Car car = carRepository.findById(rental.getCarId())
+        Car car = carRepository.findById(rental.getCar().getId())
                 .orElseThrow(() -> new EntityNotFoundException(CAR_NOT_FOUND_MESSAGE));
 
         car.setInventory(car.getInventory() + 1);
         carRepository.save(car);
     }
 
+    @Override
+    @Transactional
     @Scheduled(cron = "0 0 0 * * *") // Every day at midnight
     public void checkOverdueRentals() {
         LocalDate today = LocalDate.now();
@@ -120,29 +122,19 @@ public class RentalServiceImpl implements RentalService {
                 today, tomorrow, Rental.Status.ACTIVE);
 
         if (overdueRentals.isEmpty()) {
-            telegramNotificationService.sendNotification("No rentals overdue today or tomorrow!");
+            notificationService.sendNotification("No rentals overdue today or tomorrow!");
         } else {
             for (Rental rental : overdueRentals) {
                 String message = String.format("Overdue rental:\n\n%s", rental);
-                telegramNotificationService.sendNotification(message);
+                notificationService.sendNotification(message);
             }
         }
     }
 
-    private Long getCurrentUserIdFromDb() {
-        String username = ((UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal())
-                .getUsername();
-
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE))
-                .getId();
-    }
-
     private void validateCurrentUserOwnsRental(Rental rental) {
-        if (!rental.getUserId().equals(getCurrentUserIdFromDb())) {
+        Long rentalOwnerId = rental.getUser().getId();
+
+        if (!rentalOwnerId.equals(authenticationUtil.getCurrentUserFromDb().getId())) {
             throw new UnauthorizedViewException("You are not authorized to view this rental.");
         }
     }
