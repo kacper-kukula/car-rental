@@ -47,3 +47,15 @@ databaseChangeLog:
                   type: BIT
                   constraints:
                     nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: rentals
+            baseColumnNames: car_id
+            constraintName: fk_rentals_car_id
+            referencedTableName: cars
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: rentals
+            baseColumnNames: user_id
+            constraintName: fk_rentals_user_id
+            referencedTableName: users
+            referencedColumnNames: id

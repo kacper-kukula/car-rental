@@ -4,9 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -34,11 +37,13 @@ public class Rental {
     @Column
     private LocalDate actualReturnDate;
 
-    @Column(nullable = false)
-    private Long carId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id", nullable = false)
+    private Car car;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -55,7 +60,8 @@ public class Rental {
     @Override
     public String toString() {
         return "Rental ID: " + id + '\n'
-                + "User ID: " + userId + '\n'
+                + "Car ID: " + this.car.getId() + '\n'
+                + "User ID: " + this.user.getId() + '\n'
                 + "Start date: " + rentalDate + '\n'
                 + "Return date: " + returnDate + '\n'
                 + "Total days: " + ChronoUnit.DAYS.between(rentalDate, returnDate) + '\n'

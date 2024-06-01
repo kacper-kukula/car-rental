@@ -13,4 +13,6 @@ public interface RentalService {
     RentalResponseDto findRentalById(Long id);
 
     void returnRental(Long id);
+
+    void checkOverdueRentals();
 }

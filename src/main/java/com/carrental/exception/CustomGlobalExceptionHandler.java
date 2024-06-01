@@ -3,7 +3,9 @@ package com.carrental.exception;
 import com.carrental.exception.custom.NoInventoryAvailableException;
 import com.carrental.exception.custom.RegistrationException;
 import com.carrental.exception.custom.RentalAlreadyReturnedException;
+import com.carrental.exception.custom.StripeSessionException;
 import com.carrental.exception.custom.UnauthorizedViewException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -89,6 +91,28 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         ErrorResponse body = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST,
+                List.of(ex.getMessage()));
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(StripeSessionException.class)
+    public ResponseEntity<ErrorResponse> handleStripeSessionException(
+            StripeSessionException ex) {
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST,
+                List.of(ex.getMessage()));
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwtException(
+            ExpiredJwtException ex) {
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED,
                 List.of(ex.getMessage()));
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);

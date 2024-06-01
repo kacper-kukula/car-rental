@@ -47,3 +47,9 @@ databaseChangeLog:
                   type: BIT
                   constraints:
                     nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: payments
+            baseColumnNames: rental_id
+            constraintName: fk_payments_rental_id
+            referencedTableName: rentals
+            referencedColumnNames: id

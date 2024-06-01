@@ -2,7 +2,7 @@ package com.carrental.controller;
 
 import com.carrental.dto.rental.RentalCreateRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
-import com.carrental.repository.UserRepository;
+import com.carrental.security.AuthenticationUtil;
 import com.carrental.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,10 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class RentalController {
 
     private final RentalService rentalService;
-    private final UserRepository userRepository;
+    private final AuthenticationUtil authenticationUtil;
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -52,13 +48,20 @@ public class RentalController {
     public List<RentalResponseDto> findRentalsByUserIdAndStatus(
             @RequestParam(name = "user_id", required = false) Long userId,
             @RequestParam(name = "is_active", defaultValue = "true") boolean isActive) {
-        if (isManager()) { // Either null to get all users rentals, or for specific user only
+        if (authenticationUtil.isManager()) {
+            // Managers can view all rentals or rentals of a specific user if userId is provided
+            // If null is passed by manager, service will fetch all rentals
             return rentalService.findRentalsByUserIdAndStatus(userId, isActive);
-        } else if (userId != null) { // If a customer passes userId - FORBIDDEN
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Customers are not authorized to specify a user ID.");
-        } else { // Proceed to get rentals for current customer
-            return rentalService.findRentalsByUserIdAndStatus(getCurrentUserId(), isActive);
+        } else {
+            // Customers can only view their own rentals, so throw exception if userId is provided
+            if (userId != null) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Customers are not authorized to specify a user ID.");
+            }
+
+            // Customer passes null, so from context, service fetches only his rentals
+            return rentalService.findRentalsByUserIdAndStatus(
+                    authenticationUtil.getCurrentUserFromDb().getId(), isActive);
         }
     }
 
@@ -78,28 +81,5 @@ public class RentalController {
         rentalService.returnRental(id);
 
         return ResponseEntity.ok("Rental (ID: " + id + ") successfully returned.");
-    }
-
-    private Authentication getAuthentication() {
-        return SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-    }
-
-    private boolean isManager() {
-        return getAuthentication()
-                .getAuthorities()
-                .stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_MANAGER"));
-    }
-
-    private Long getCurrentUserId() {
-        String username = ((UserDetails) getAuthentication()
-                .getPrincipal())
-                .getUsername();
-
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found."))
-                .getId();
     }
 }
