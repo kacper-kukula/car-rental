@@ -1,5 +1,6 @@
 package com.carrental.security;
 
+import com.carrental.security.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

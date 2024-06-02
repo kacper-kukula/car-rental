@@ -4,7 +4,7 @@ import com.carrental.dto.payment.PaymentCreateRequestDto;
 import com.carrental.dto.payment.PaymentPausedResponseDto;
 import com.carrental.dto.payment.PaymentResponseDto;
 import com.carrental.model.Payment;
-import com.carrental.security.AuthenticationUtil;
+import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

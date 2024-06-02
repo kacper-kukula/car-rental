@@ -9,7 +9,7 @@ import com.carrental.model.Payment;
 import com.carrental.model.Rental;
 import com.carrental.repository.PaymentRepository;
 import com.carrental.repository.RentalRepository;
-import com.carrental.security.AuthenticationUtil;
+import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.NotificationService;
 import com.carrental.service.PaymentService;
 import com.stripe.Stripe;
