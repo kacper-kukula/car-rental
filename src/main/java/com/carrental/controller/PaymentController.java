@@ -67,7 +67,8 @@ public class PaymentController {
     }
 
     @Operation(summary = "Check successful payment",
-            description = "Check if the payment succeeded based on ID and TYPE")
+            description = "Check if the payment succeeded based on ID and TYPE "
+                    + "(Endpoint for stripe redirection)")
     @GetMapping("/success/{id}")
     public PaymentResponseDto checkSuccessfulPayment(
             @PathVariable Long id,
@@ -76,7 +77,8 @@ public class PaymentController {
     }
 
     @Operation(summary = "Get paused payment message",
-            description = "Returns a message that the payment has been paused")
+            description = "Returns a message that the payment has been paused "
+                    + "(Endpoint for stripe redirection)")
     @GetMapping("/cancel/{id}")
     public PaymentPausedResponseDto returnPausedPayment(@PathVariable Long id) {
         return paymentService.returnPausedPayment(id);

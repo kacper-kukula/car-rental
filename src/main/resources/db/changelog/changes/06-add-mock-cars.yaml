@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-mock-cars
+      author: Kacper Kukula
+      changes:
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: model
+                  value: 'M3 Competition'
+              - column:
+                  name: brand
+                  value: 'BMW'
+              - column:
+                  name: type
+                  value: 'SEDAN'
+              - column:
+                  name: inventory
+                  value: '3'
+              - column:
+                  name: daily_fee
+                  value: '250.00'
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: model
+                  value: 'M5 CS'
+              - column:
+                  name: brand
+                  value: 'BMW'
+              - column:
+                  name: type
+                  value: 'SEDAN'
+              - column:
+                  name: inventory
+                  value: '1'
+              - column:
+                  name: daily_fee
+                  value: '450.00'
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: model
+                  value: 'RS7'
+              - column:
+                  name: brand
+                  value: 'Audi'
+              - column:
+                  name: type
+                  value: 'SEDAN'
+              - column:
+                  name: inventory
+                  value: '2'
+              - column:
+                  name: daily_fee
+                  value: '400.00'
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
