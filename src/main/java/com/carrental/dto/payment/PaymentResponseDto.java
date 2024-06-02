@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 public record PaymentResponseDto(
         Long id,
-        String rentalId,
+        Long rentalId,
         BigDecimal amountToPay,
         String sessionUrl,
         String sessionId,

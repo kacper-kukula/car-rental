@@ -104,8 +104,23 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setSessionId(session.getId());
 
         Payment savedPayment = paymentRepository.save(payment);
+        PaymentResponseDto dto = paymentMapper.toDto(savedPayment);
 
-        return paymentMapper.toDto(savedPayment);
+        String formattedMessage = String.format("""
+                        New payment created:
+                                                
+                        Payment ID: %d
+                        Rental ID: %d
+                        Total: $%s
+                        Session ID: %s
+                        Status: %s
+                        Type: %s""",
+                dto.id(), dto.rentalId(), dto.amountToPay(),
+                dto.sessionId(), dto.status(), dto.type());
+
+        notificationService.sendNotification(formattedMessage);
+
+        return dto;
     }
 
     @Override
@@ -144,7 +159,18 @@ public class PaymentServiceImpl implements PaymentService {
             Payment savedPayment = paymentRepository.save(payment);
 
             PaymentResponseDto dto = paymentMapper.toDto(savedPayment);
-            notificationService.sendNotification(String.valueOf(dto));
+
+            String formattedMessage = String.format("""
+                            Payment paid:
+                                                        
+                            Payment ID: %d
+                            Rental ID: %d
+                            Total: $%s
+                            Status: %s
+                            Type: %s""",
+                    dto.id(), dto.rentalId(), dto.amountToPay(), dto.status(), dto.type());
+
+            notificationService.sendNotification(formattedMessage);
 
             return dto;
         }
