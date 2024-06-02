@@ -16,6 +16,7 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -23,7 +24,6 @@ import java.math.RoundingMode;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -44,13 +44,11 @@ public class PaymentServiceImpl implements PaymentService {
     private final RentalRepository rentalRepository;
     private final AuthenticationUtil authenticationUtil;
     private final NotificationService notificationService;
-
-    @Value("${stripe.secret.key}")
-    private String stripeSecretKey;
+    private final Dotenv dotenv;
 
     @PostConstruct
     public void init() {
-        Stripe.apiKey = stripeSecretKey;
+        Stripe.apiKey = dotenv.get("STRIPE_SECRET_KEY");
     }
 
     @Override

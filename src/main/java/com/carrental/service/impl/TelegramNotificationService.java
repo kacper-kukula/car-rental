@@ -1,7 +1,7 @@
 package com.carrental.service.impl;
 
 import com.carrental.service.NotificationService;
-import org.springframework.beans.factory.annotation.Value;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,12 +12,13 @@ public class TelegramNotificationService implements NotificationService {
             "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final String botToken;
+    private final String chatId;
 
-    @Value("${telegram.bot.token}")
-    private String botToken;
-
-    @Value("${telegram.chat.id}")
-    private String chatId;
+    public TelegramNotificationService(Dotenv dotenv) {
+        this.botToken = dotenv.get("TELEGRAM_BOT_TOKEN");
+        this.chatId = dotenv.get("TELEGRAM_CHAT_ID");
+    }
 
     @Override
     public void sendNotification(String message) {

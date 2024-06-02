@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changes/04-add-mock-users.yaml
   - include:
       file: db/changelog/changes/05-create-payments-table.yaml
+  - include:
+      file: db/changelog/changes/06-add-mock-cars.yaml
