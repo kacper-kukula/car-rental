@@ -8,10 +8,9 @@ import com.carrental.exception.custom.RegistrationException;
 import com.carrental.mapper.UserMapper;
 import com.carrental.model.User;
 import com.carrental.repository.UserRepository;
+import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationUtil authenticationUtil;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
@@ -53,28 +53,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getProfile() {
-        return userMapper.toDto(getCurrentUserFromDb());
+        return userMapper.toDto(authenticationUtil.getCurrentUserFromDb());
     }
 
     @Override
     public UserResponseDto updateProfile(UserUpdateRequestDto request) {
-        User user = getCurrentUserFromDb();
+        User user = authenticationUtil.getCurrentUserFromDb();
 
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         User updatedUser = userRepository.save(user);
 
         return userMapper.toDto(updatedUser);
-    }
-
-    private User getCurrentUserFromDb() {
-        String username = ((UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal())
-                .getUsername();
-
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MESSAGE));
     }
 }
