@@ -2,7 +2,7 @@ package com.carrental.controller;
 
 import com.carrental.dto.rental.RentalCreateRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
-import com.carrental.security.AuthenticationUtil;
+import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

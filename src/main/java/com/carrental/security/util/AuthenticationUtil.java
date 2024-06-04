@@ -1,4 +1,4 @@
-package com.carrental.security;
+package com.carrental.security.util;
 
 import com.carrental.model.User;
 import com.carrental.repository.UserRepository;

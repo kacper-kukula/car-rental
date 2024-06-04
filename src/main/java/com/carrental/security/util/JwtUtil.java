@@ -1,4 +1,4 @@
-package com.carrental.security;
+package com.carrental.security.util;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;

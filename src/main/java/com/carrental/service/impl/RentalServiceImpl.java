@@ -10,7 +10,7 @@ import com.carrental.model.Car;
 import com.carrental.model.Rental;
 import com.carrental.repository.CarRepository;
 import com.carrental.repository.RentalRepository;
-import com.carrental.security.AuthenticationUtil;
+import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.NotificationService;
 import com.carrental.service.RentalService;
 import jakarta.persistence.EntityNotFoundException;

@@ -2,6 +2,7 @@ package com.carrental.security;
 
 import com.carrental.dto.user.UserLoginRequestDto;
 import com.carrental.dto.user.UserLoginResponseDto;
+import com.carrental.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
