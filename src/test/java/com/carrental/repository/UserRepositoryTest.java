@@ -1,6 +1,5 @@
 package com.carrental.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.carrental.model.User;
@@ -18,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -61,16 +61,15 @@ public class UserRepositoryTest {
     @DisplayName("Find manager given valid email")
     void findByEmail_ValidUserEmail_ReturnsManager() {
         // Given
-        String managerEmail = "testmanager@rental.com";
-        User.Role role = User.Role.MANAGER;
+        String testEmail = "testmanager@rental.com";
+        User expected = getExpectedUser();
 
         // When
-        Optional<User> actual = userRepository.findByEmail(managerEmail);
+        Optional<User> actual = userRepository.findByEmail(testEmail);
 
         // Then
         assertTrue(actual.isPresent());
-        assertEquals(managerEmail, actual.get().getEmail());
-        assertEquals(role, actual.get().getRole());
+        EqualsBuilder.reflectionEquals(expected, actual);
     }
 
     @Test
@@ -84,5 +83,17 @@ public class UserRepositoryTest {
 
         // Then
         assertTrue(actual.isEmpty());
+    }
+
+    private User getExpectedUser() {
+        User user = new User();
+        user.setId(888L);
+        user.setEmail("testmanager@rental.com");
+        user.setPassword("$2a$10$hLSU4qNrQO6lItn7H/cALuq0YvqLUmAVZ5qlKLsmigSV7FberE8v2");
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setRole(User.Role.MANAGER);
+
+        return user;
     }
 }
