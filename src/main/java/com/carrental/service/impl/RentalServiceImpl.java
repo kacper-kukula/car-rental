@@ -17,9 +17,11 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -65,12 +67,20 @@ public class RentalServiceImpl implements RentalService {
     @Transactional
     public List<RentalResponseDto> findRentalsByUserIdAndStatus(Long userId, boolean isActive) {
         Rental.Status status = isActive ? Rental.Status.ACTIVE : Rental.Status.RETURNED;
-        List<Rental> rentals;
+        boolean isManager = authenticationUtil.isManager();
 
-        if (userId == null) {
-            rentals = rentalRepository.findByStatus(status);
+        if (!isManager && userId != null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Customers are not authorized to specify a user ID.");
+        }
+
+        List<Rental> rentals;
+        if (!isManager) {
+            rentals = rentalRepository.findByUserIdAndStatus(
+                    authenticationUtil.getCurrentUserFromDb().getId(), status);
         } else {
-            rentals = rentalRepository.findByUserIdAndStatus(userId, status);
+            rentals = (userId != null) ? rentalRepository.findByUserIdAndStatus(userId, status) :
+                    rentalRepository.findByStatus(status);
         }
 
         return rentals.stream()

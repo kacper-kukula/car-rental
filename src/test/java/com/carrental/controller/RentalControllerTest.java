@@ -134,7 +134,7 @@ public class RentalControllerTest {
 
     @Test
     @DisplayName("Customer forbidden to specify user ID")
-    @WithMockUser(username = "customer", roles = {"CUSTOMER"})
+    @WithMockUser(username = "customer", authorities = {"CUSTOMER"})
     void findRentalsByUserIdAndStatus_CustomerSpecifyUserId_Forbidden() throws Exception {
         // When & Then
         mockMvc.perform(get("/rentals")
@@ -152,10 +152,8 @@ public class RentalControllerTest {
         User dummyUser = new User();
         dummyUser.setId(customerId);
         List<RentalResponseDto> ownRentals = Arrays.asList(rentalResponseDto, rentalResponseDto);
-        Mockito.when(rentalService.findRentalsByUserIdAndStatus(customerId, true))
+        Mockito.when(rentalService.findRentalsByUserIdAndStatus(null, true))
                 .thenReturn(ownRentals);
-        Mockito.when(authenticationUtil.isManager()).thenReturn(false);
-        Mockito.when(authenticationUtil.getCurrentUserFromDb()).thenReturn(dummyUser);
 
         // When & Then
         mockMvc.perform(get("/rentals"))

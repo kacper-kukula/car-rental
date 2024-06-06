@@ -115,6 +115,7 @@ public class RentalServiceTest {
                 .thenReturn(rentals);
         when(rentalMapper.toDto(rental1)).thenReturn(responseDto1);
         when(rentalMapper.toDto(rental2)).thenReturn(responseDto2);
+        when(authenticationUtil.isManager()).thenReturn(true);
 
         // When
         List<RentalResponseDto> actual =

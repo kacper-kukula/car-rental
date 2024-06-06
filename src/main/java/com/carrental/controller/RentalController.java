@@ -2,7 +2,6 @@ package com.carrental.controller;
 
 import com.carrental.dto.rental.RentalCreateRequestDto;
 import com.carrental.dto.rental.RentalResponseDto;
-import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @Tag(name = "Car Rentals Management",
         description = "Endpoints for managing user's car rentals")
@@ -30,7 +28,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class RentalController {
 
     private final RentalService rentalService;
-    private final AuthenticationUtil authenticationUtil;
 
     @PostMapping
     @PreAuthorize("hasRole('CUSTOMER')")
@@ -48,21 +45,7 @@ public class RentalController {
     public List<RentalResponseDto> findRentalsByUserIdAndStatus(
             @RequestParam(name = "user_id", required = false) Long userId,
             @RequestParam(name = "is_active", defaultValue = "true") boolean isActive) {
-        if (authenticationUtil.isManager()) {
-            // Managers can view all rentals or rentals of a specific user if userId is provided
-            // If null is passed by manager, service will fetch all rentals
-            return rentalService.findRentalsByUserIdAndStatus(userId, isActive);
-        } else {
-            // Customers can only view their own rentals, so throw exception if userId is provided
-            if (userId != null) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "Customers are not authorized to specify a user ID.");
-            }
-
-            // Customer passes null, so from context, service fetches only his rentals
-            return rentalService.findRentalsByUserIdAndStatus(
-                    authenticationUtil.getCurrentUserFromDb().getId(), isActive);
-        }
+        return rentalService.findRentalsByUserIdAndStatus(userId, isActive);
     }
 
     @GetMapping("/{id}")
