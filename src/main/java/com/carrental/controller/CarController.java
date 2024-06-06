@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,8 +43,8 @@ public class CarController {
     @GetMapping
     @Operation(summary = "Get all cars",
             description = "Get a list of all available cars")
-    public List<CarResponseDto> findAllCars() {
-        return carService.findAllCars();
+    public List<CarResponseDto> findAllCars(Pageable pageable) {
+        return carService.findAllCars(pageable);
     }
 
     @GetMapping("/{id}")
