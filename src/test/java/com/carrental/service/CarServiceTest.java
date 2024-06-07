@@ -21,6 +21,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class CarServiceTest {
@@ -60,7 +64,7 @@ public class CarServiceTest {
     }
 
     @Test
-    @DisplayName("Verify that findAllCars() method works")
+    @DisplayName("Verify that findAllCars() method works with pagination")
     void findAllCars_ReturnsAllCars() {
         // Given
         Car car1 = getDummyCar();
@@ -80,16 +84,19 @@ public class CarServiceTest {
         List<Car> cars = List.of(car1, car2);
         List<CarResponseDto> expected = List.of(carResponseDto1, carResponseDto2);
 
-        when(carRepository.findAll()).thenReturn(cars);
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Car> carPage = new PageImpl<>(cars, pageable, cars.size());
+
+        when(carRepository.findAll(pageable)).thenReturn(carPage);
         when(carMapper.toDto(car1)).thenReturn(carResponseDto1);
         when(carMapper.toDto(car2)).thenReturn(carResponseDto2);
 
         // When
-        List<CarResponseDto> actual = carService.findAllCars();
+        List<CarResponseDto> actual = carService.findAllCars(pageable);
 
         // Then
         assertThat(actual).containsExactlyElementsOf(expected);
-        verify(carRepository, times(1)).findAll();
+        verify(carRepository, times(1)).findAll(pageable);
         verify(carMapper, times(1)).toDto(car1);
         verify(carMapper, times(1)).toDto(car2);
         verifyNoMoreInteractions(carRepository, carMapper);

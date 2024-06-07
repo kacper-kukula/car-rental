@@ -9,6 +9,7 @@ import com.carrental.service.CarService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,10 +30,8 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarResponseDto> findAllCars() {
-        List<Car> cars = carRepository.findAll();
-
-        return cars.stream()
+    public List<CarResponseDto> findAllCars(Pageable pageable) {
+        return carRepository.findAll(pageable).stream()
                 .map(carMapper::toDto)
                 .toList();
     }

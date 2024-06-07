@@ -24,8 +24,10 @@ import java.math.RoundingMode;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
@@ -104,19 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         PaymentResponseDto dto = paymentMapper.toDto(savedPayment);
 
-        String formattedMessage = String.format("""
-                        New payment created:
-                                                
-                        Payment ID: %d
-                        Rental ID: %d
-                        Total: $%s
-                        Session ID: %s
-                        Status: %s
-                        Type: %s""",
-                dto.id(), dto.rentalId(), dto.amountToPay(),
-                dto.sessionId(), dto.status(), dto.type());
-
-        notificationService.sendNotification(formattedMessage);
+        notificationService.createPaymentMessage(dto);
 
         return dto;
     }
@@ -124,18 +114,25 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public List<PaymentResponseDto> findPayments(Long userId) {
-        List<Payment> payments;
+        boolean isManager = authenticationUtil.isManager();
 
-        if (authenticationUtil.isManager() && userId == null) {
-            payments = paymentRepository.findAll();
+        if (!isManager && userId != null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Customers are not authorized to specify a user ID.");
+        }
+
+        List<Payment> payments;
+        if (!isManager) {
+            payments = paymentRepository.findByUserId(
+                    authenticationUtil.getCurrentUserFromDb().getId());
         } else {
-            payments = paymentRepository.findByUserId(userId);
+            payments = (userId != null)
+                    ? paymentRepository.findByUserId(userId) : paymentRepository.findAll();
         }
 
         return payments.stream()
                 .map(paymentMapper::toDto)
                 .toList();
-
     }
 
     @Override
@@ -158,17 +155,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             PaymentResponseDto dto = paymentMapper.toDto(savedPayment);
 
-            String formattedMessage = String.format("""
-                            Payment paid:
-                                                        
-                            Payment ID: %d
-                            Rental ID: %d
-                            Total: $%s
-                            Status: %s
-                            Type: %s""",
-                    dto.id(), dto.rentalId(), dto.amountToPay(), dto.status(), dto.type());
-
-            notificationService.sendNotification(formattedMessage);
+            notificationService.paidPaymentMessage(dto);
 
             return dto;
         }

@@ -4,7 +4,6 @@ import com.carrental.dto.payment.PaymentCreateRequestDto;
 import com.carrental.dto.payment.PaymentPausedResponseDto;
 import com.carrental.dto.payment.PaymentResponseDto;
 import com.carrental.model.Payment;
-import com.carrental.security.util.AuthenticationUtil;
 import com.carrental.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @Tag(name = "Rentals payment management",
         description = "Endpoints for managing payments")
@@ -31,7 +29,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final AuthenticationUtil authenticationUtil;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('CUSTOMER', 'MANAGER')")
@@ -39,21 +36,7 @@ public class PaymentController {
             description = "Get payment for particular user, or for currently logged in customer")
     public List<PaymentResponseDto> findPayments(
             @RequestParam(name = "user_id", required = false) Long userId) {
-        if (authenticationUtil.isManager()) {
-            // Managers can view all payments or of a specific user if userId is provided
-            // If null is passed by manager, service fetches all payments
-            return paymentService.findPayments(userId);
-        } else {
-            // Customers can only view their own payments - exception thrown if userId is provided
-            if (userId != null) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "Customers are not authorized to specify a user ID.");
-            }
-
-            // Customer passes null, so from context, service fetches only his payments
-            return paymentService.findPayments(
-                    authenticationUtil.getCurrentUserFromDb().getId());
-        }
+        return paymentService.findPayments(userId);
     }
 
     @PostMapping

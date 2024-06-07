@@ -1,5 +1,7 @@
 package com.carrental.controller;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -24,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -78,10 +82,14 @@ public class CarControllerTest {
     void findAllCars_CarsRetrieved_ReturnsListOfCarResponseDto() throws Exception {
         // Given
         List<CarResponseDto> carList = Arrays.asList(carResponseDto, carResponseDto);
-        Mockito.when(carService.findAllCars()).thenReturn(carList);
+        Pageable pageable = PageRequest.of(0, 2);
+
+        Mockito.when(carService.findAllCars(pageable)).thenReturn(carList);
 
         // When & Then
         mockMvc.perform(get("/cars")
+                        .param("page", "0")
+                        .param("size", "2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -97,6 +105,8 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$[1].inventory").value(carResponseDto.inventory()))
                 .andExpect(jsonPath("$[1].dailyFee").value(carResponseDto.dailyFee()))
                 .andExpect(jsonPath("$[1].type").value(carResponseDto.type().toString()));
+
+        verify(carService, times(1)).findAllCars(pageable);
     }
 
     @Test
