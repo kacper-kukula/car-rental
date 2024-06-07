@@ -1,7 +1,6 @@
 package com.carrental.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,7 +71,7 @@ public class RentalServiceTest {
         when(authenticationUtil.getCurrentUserFromDb()).thenReturn(user);
         when(rentalRepository.save(rental)).thenReturn(rental);
         when(rentalMapper.toDto(rental)).thenReturn(expectedResponseDto);
-        doNothing().when(notificationService).sendNotification(anyString());
+        doNothing().when(notificationService).createRentalMessage(rental, car);
 
         // When
         RentalResponseDto actual = rentalService.createRental(requestDto);
@@ -82,7 +81,7 @@ public class RentalServiceTest {
         verify(carRepository, times(1)).findById(requestDto.carId());
         verify(rentalRepository, times(1)).save(rental);
         verify(rentalMapper, times(1)).toDto(rental);
-        verify(notificationService, times(1)).sendNotification(anyString());
+        verify(notificationService, times(1)).createRentalMessage(rental, car);
         verifyNoMoreInteractions(carRepository, rentalRepository, rentalMapper);
     }
 

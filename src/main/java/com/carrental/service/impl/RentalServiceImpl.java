@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,7 +28,6 @@ public class RentalServiceImpl implements RentalService {
 
     private static final String RENTAL_NOT_FOUND_MESSAGE = "Rental not found.";
     private static final String CAR_NOT_FOUND_MESSAGE = "Car not found.";
-    private static final String TELEGRAM_MESSAGE = "New rental created\n\n%s\n\n%s";
 
     private final RentalRepository rentalRepository;
     private final CarRepository carRepository;
@@ -58,7 +56,7 @@ public class RentalServiceImpl implements RentalService {
         rental.setReturnDate(request.returnDate());
         Rental savedRental = rentalRepository.save(rental);
 
-        notificationService.sendNotification(String.format(TELEGRAM_MESSAGE, rental, car));
+        notificationService.createRentalMessage(rental, car);
 
         return rentalMapper.toDto(savedRental);
     }
@@ -120,25 +118,6 @@ public class RentalServiceImpl implements RentalService {
 
         car.setInventory(car.getInventory() + 1);
         carRepository.save(car);
-    }
-
-    @Override
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * *") // Every day at midnight
-    public void checkOverdueRentals() {
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plusDays(1);
-        List<Rental> overdueRentals = rentalRepository.findAllByReturnDateBetweenAndStatus(
-                today, tomorrow, Rental.Status.ACTIVE);
-
-        if (overdueRentals.isEmpty()) {
-            notificationService.sendNotification("No rentals overdue today or tomorrow!");
-        } else {
-            for (Rental rental : overdueRentals) {
-                String message = String.format("Overdue rental:\n\n%s", rental);
-                notificationService.sendNotification(message);
-            }
-        }
     }
 
     private void validateCurrentUserOwnsRental(Rental rental) {

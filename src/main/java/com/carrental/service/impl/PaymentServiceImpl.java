@@ -106,19 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         PaymentResponseDto dto = paymentMapper.toDto(savedPayment);
 
-        String formattedMessage = String.format("""
-                        New payment created:
-                                                
-                        Payment ID: %d
-                        Rental ID: %d
-                        Total: $%s
-                        Session ID: %s
-                        Status: %s
-                        Type: %s""",
-                dto.id(), dto.rentalId(), dto.amountToPay(),
-                dto.sessionId(), dto.status(), dto.type());
-
-        notificationService.sendNotification(formattedMessage);
+        notificationService.createPaymentMessage(dto);
 
         return dto;
     }
@@ -138,8 +126,8 @@ public class PaymentServiceImpl implements PaymentService {
             payments = paymentRepository.findByUserId(
                     authenticationUtil.getCurrentUserFromDb().getId());
         } else {
-            payments = (userId != null) ?
-                    paymentRepository.findByUserId(userId) : paymentRepository.findAll();
+            payments = (userId != null)
+                    ? paymentRepository.findByUserId(userId) : paymentRepository.findAll();
         }
 
         return payments.stream()
@@ -167,17 +155,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             PaymentResponseDto dto = paymentMapper.toDto(savedPayment);
 
-            String formattedMessage = String.format("""
-                            Payment paid:
-                                                        
-                            Payment ID: %d
-                            Rental ID: %d
-                            Total: $%s
-                            Status: %s
-                            Type: %s""",
-                    dto.id(), dto.rentalId(), dto.amountToPay(), dto.status(), dto.type());
-
-            notificationService.sendNotification(formattedMessage);
+            notificationService.paidPaymentMessage(dto);
 
             return dto;
         }
